@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+/*
+ * HeritageLens design tokens. Palette drawn from Gujarat's built heritage: sandstone & parchment
+ * ground, terracotta brick, indigo dye, ochre pigment. Text/background pairs used below meet
+ * WCAG AA (ink on parchment ≈17:1, terracotta on parchment ≈6.8:1, muted on parchment ≈5.6:1,
+ * white on indigo ≈11:1).
+ */
+@theme {
+  --color-parchment: #fbf7f0;
+  --color-sand: #f4ecdf;
+  --color-sandstone: #e8dac3;
+  --color-sandstone-dark: #cbb592;
+  --color-ink: #14110f;
+  --color-ink-soft: #3d3631;
+  --color-muted: #6b6159;
+  --color-terracotta: #9a3412;
+  --color-terracotta-dark: #7c2d12;
+  --color-terracotta-soft: #f8e3d8;
+  --color-indigo-ink: #1e3a5f;
+  --color-indigo-ink-dark: #142a46;
+  --color-indigo-soft: #e2e9f2;
+  --color-ochre: #b45309;
+  --color-ochre-soft: #fbecd5;
+  --color-moss: #3f6212;
+  --color-moss-soft: #e8f0d8;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fde2e2;
+
+  --radius-card: 0.875rem;
+  --shadow-card: 0 1px 2px rgb(20 17 15 / 0.06), 0 4px 16px rgb(20 17 15 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(20 17 15 / 0.08), 0 12px 32px rgb(20 17 15 / 0.12);
+
+  --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(0.8);
+    }
+  }
+}
+
+@theme inline {
+  --font-serif: var(--font-crimson), "Noto Serif", Georgia, serif;
+  --font-sans:
+    var(--font-atkinson), var(--font-noto-gujarati), var(--font-noto-devanagari), system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-indic: var(--font-noto-gujarati), var(--font-noto-devanagari), var(--font-atkinson), sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-parchment);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :lang(gu),
+  :lang(hi),
+  :lang(mr),
+  :lang(sa) {
+    font-family: var(--font-indic);
+    line-height: 1.8;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-ochre);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  mark {
+    background: var(--color-ochre-soft);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 2px;
+    box-shadow: inset 0 -2px 0 var(--color-ochre);
+  }
+
+  ::selection {
+    background: var(--color-terracotta-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Swipeable rows (compact nav, chip strips) scroll without a native scrollbar. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  .card {
+    background: white;
+    border: 1px solid var(--color-sandstone);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-terracotta);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    font-weight: 700;
+    font-size: 0.925rem;
+    line-height: 1.2;
+    transition:
+      background-color 150ms,
+      color 150ms,
+      box-shadow 150ms,
+      transform 150ms;
+    white-space: nowrap;
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--color-terracotta);
+    color: white;
+  }
+  .btn-primary:not(:disabled):hover {
+    background: var(--color-terracotta-dark);
+  }
+  .btn-secondary {
+    background: white;
+    color: var(--color-ink);
+    border: 1px solid var(--color-sandstone-dark);
+  }
+  .btn-secondary:not(:disabled):hover {
+    background: var(--color-sand);
+  }
+  .btn-ghost {
+    color: var(--color-ink-soft);
+  }
+  .btn-ghost:not(:disabled):hover {
+    background: var(--color-sand);
+  }
+
+  .field {
+    width: 100%;
+    border: 1px solid var(--color-sandstone-dark);
+    background: white;
+    border-radius: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.95rem;
+  }
+  .field:focus-visible {
+    outline-offset: 0;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-sandstone-dark);
+    background: white;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-ink-soft);
+    transition: background-color 150ms;
+  }
+  .chip:hover {
+    background: var(--color-sand);
+  }
+  .chip[aria-pressed="true"],
+  .chip[aria-current="page"] {
+    background: var(--color-indigo-ink);
+    border-color: var(--color-indigo-ink);
+    color: white;
+  }
+
+  .jali {
+    background-color: var(--color-indigo-ink);
+    background-image:
+      radial-gradient(circle at 50% 50%, rgb(255 255 255 / 0.07) 0 18%, transparent 19%),
+      radial-gradient(circle at 0 0, rgb(255 255 255 / 0.05) 0 22%, transparent 23%),
+      radial-gradient(circle at 100% 100%, rgb(255 255 255 / 0.05) 0 22%, transparent 23%);
+    background-size: 28px 28px;
+  }
+}
+
+/* MapLibre popups in the house style */
+.maplibregl-popup-content {
+  border-radius: 0.75rem !important;
+  padding: 0 !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-lift) !important;
+  font-family: var(--font-sans);
+}
+.maplibregl-ctrl-attrib {
+  font-size: 11px;
+}

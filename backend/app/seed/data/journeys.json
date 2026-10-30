@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "stepwells-of-north-gujarat",
+    "title": "Stepwells of North Gujarat",
+    "fellow": "Aarohi Mehta (sample fellow)",
+    "year": 2024,
+    "region": "North Gujarat",
+    "color": "#9A3412",
+    "summary": "A two-week expedition tracing how water architecture evolved from the Chaulukya temple tank at Modhera to the Sultanate-era vavs of Ahmedabad, recorded in Hindi and Gujarati field notes.",
+    "stops": [
+      {"site": "adalaj", "visited_on": "2024-01-10", "narrative": "Started at dawn at Adalaj, where the light falls through the octagonal openings into the lower galleries."},
+      {"site": "dada-harir", "visited_on": "2024-01-11", "narrative": "Found the twin inscriptions in Sanskrit and Arabic and photographed both for transcription."},
+      {"site": "modhera", "visited_on": "2024-01-13", "narrative": "Sketched the Surya Kund: a stepped tank that shares its vocabulary with the stepwells."},
+      {"site": "rani-ki-vav", "visited_on": "2024-01-14", "narrative": "Two days at Rani ki Vav counting sculptures gallery by gallery."},
+      {"site": "patan-patola", "visited_on": "2024-01-16", "narrative": "Ended with the Salvi weavers of Patan, whose double-ikat patterns echo the stepwell's geometry."}
+    ]
+  },
+  {
+    "slug": "kutch-crafts-trail",
+    "title": "Kutch Crafts Trail",
+    "fellow": "Kabir Sheikh (sample fellow)",
+    "year": 2025,
+    "region": "Kutch",
+    "color": "#1E3A5F",
+    "summary": "Living heritage after the 2001 earthquake: palaces under repair, craft villages rebuilt, and the Harappan city that once mastered the same desert's water.",
+    "stops": [
+      {"site": "aina-mahal", "visited_on": "2025-02-03", "narrative": "Began in Bhuj at the Aina Mahal, still carrying the scars of the 2001 earthquake."},
+      {"site": "ajrakhpur", "visited_on": "2025-02-04", "narrative": "Spent a day with Ajrakh printers, following one cloth through its many dye baths."},
+      {"site": "nirona", "visited_on": "2025-02-05", "narrative": "Watched Rogan painting and copper bell-making in Nirona."},
+      {"site": "dholavira", "visited_on": "2025-02-07", "narrative": "Crossed the Rann to Dholavira to study its reservoirs."}
+    ]
+  },
+  {
+    "slug": "baolis-of-the-north",
+    "title": "Baolis of the North",
+    "fellow": "Meera Iyer (sample fellow)",
+    "year": 2023,
+    "region": "Delhi and Rajasthan",
+    "color": "#B45309",
+    "summary": "From a Delhi baoli wrapped in ghost stories to the vertiginous geometry of Abhaneri and a Jodhpur jhalra brought back to life.",
+    "stops": [
+      {"site": "agrasen-ki-baoli", "visited_on": "2023-03-01", "narrative": "Collected stories about the baoli's 'black water' from Old Delhi residents."},
+      {"site": "chand-baori", "visited_on": "2023-03-03", "narrative": "Measured shadows across the thirteen storeys of Chand Baori."},
+      {"site": "toorji-ka-jhalra", "visited_on": "2023-03-06", "narrative": "Ended at Toorji ka Jhalra, restored and full of life again."}
+    ]
+  }
+]

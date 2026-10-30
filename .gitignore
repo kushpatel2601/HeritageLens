@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Runtime state (SQLite DB, local object storage, model + seed caches)
+backend/var/
+backend/var-*/
+*.db
+*.db-shm
+*.db-wal
+
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+*.tsbuildinfo
+
+# Notebooks / GPU worker outputs
+.ipynb_checkpoints/
+ml/**/outputs/
+ml/**/hf-cache/
+
+# Secrets & local config
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Tooling
+.playwright-mcp/
+test-results/
+playwright-report/

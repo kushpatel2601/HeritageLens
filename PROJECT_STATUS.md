@@ -193,17 +193,23 @@ Done:
 - [x] `YOUR-USERNAME` replaced with `kushpatel2601` in the README badges, the notebook's `REPO_URL` and
       `frontend/.env.example`.
 - [x] CI is green on GitHub: backend, GPU worker and frontend jobs all pass.
+- [x] Ran the real GPU worker once on a Colab T4, through a `cloudflared` tunnel. It finished 14 jobs with 0 failures:
+  - OCR of asset 53 (Tesseract 5) and its translation (NLLB-200; IndicTrans2 did not load in Colab).
+  - BLIP captions for assets 55–57.
+  - Real 3D twins (Depth Anything V2 depth reliefs) for Rani ki Vav, Adalaj, Chand Baori, Modhera, Hampi, Dada
+    Harir, Toorji ka Jhalra and Agrasen ki Baoli. Each site page shows these first, ahead of the procedural demos.
+  - These results live in your local database (`backend/var/`, not in git). Don't re-seed or delete `backend/var/`
+    before the demo; if you do, run the Colab worker again.
 
 Still to do:
 
 | Task | Time |
 |---|---|
-| Run the GPU worker once on Colab, so the demo shows real OCR, translation and 3D twins. Open it from the "Open in Colab" badge in the README. Your PC needs the API plus a `cloudflared` tunnel running; see notebook step 4 | ~30 min |
 | Record the demo video | 1–2 h |
 | Make the pitch deck (**at most 10 slides**) | ~2 h |
 | Submit on the HackCult portal before **4 Nov 2026, 6:30 PM IST** | — |
 
-**Estimated time left:** no build work; about 4–5 h of your own tasks.
+**Estimated time left:** no build work; about 3–4 h of your own tasks (video, deck, submission).
 
 ---
 

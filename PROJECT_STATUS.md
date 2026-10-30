@@ -187,12 +187,18 @@ Listed in priority order, with estimates.
 
 ### E. Your tasks · cannot be automated
 
+Done:
+
+- [x] Public repository: https://github.com/kushpatel2601/HeritageLens, branch `main`.
+- [x] `YOUR-USERNAME` replaced with `kushpatel2601` in the README badges, the notebook's `REPO_URL` and
+      `frontend/.env.example`.
+- [x] CI is green on GitHub: backend, GPU worker and frontend jobs all pass.
+
+Still to do:
+
 | Task | Time |
 |---|---|
-| Create a **public** GitHub repository named `HeritageLens` and push (`git remote add origin <url>`, then `git push -u origin main`) | ~10 min |
-| Replace `YOUR-USERNAME` with your GitHub username in `README.md` (lines 5–6, the two badges), `notebooks/heritage_gpu_worker.ipynb` (`REPO_URL`) and, optionally, `frontend/.env.example`. Commit and push again | ~5 min |
-| Check the CI run turns green on GitHub (Actions tab) | ~10 min |
-| Run the GPU worker once on Colab, so the demo shows real OCR, translation and 3D twins | ~30 min |
+| Run the GPU worker once on Colab, so the demo shows real OCR, translation and 3D twins. Open it from the "Open in Colab" badge in the README. Your PC needs the API plus a `cloudflared` tunnel running; see notebook step 4 | ~30 min |
 | Record the demo video | 1–2 h |
 | Make the pitch deck (**at most 10 slides**) | ~2 h |
 | Submit on the HackCult portal before **4 Nov 2026, 6:30 PM IST** | — |

@@ -2,8 +2,8 @@
 
 **Turning unstructured cultural and architectural heritage archives into a searchable, mappable, immersive atlas.**
 
-[![CI](https://github.com/YOUR-USERNAME/HeritageLens/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR-USERNAME/HeritageLens/actions/workflows/ci.yml)
-[![Open the GPU worker in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR-USERNAME/HeritageLens/blob/main/notebooks/heritage_gpu_worker.ipynb)
+[![CI](https://github.com/kushpatel2601/HeritageLens/actions/workflows/ci.yml/badge.svg)](https://github.com/kushpatel2601/HeritageLens/actions/workflows/ci.yml)
+[![Open the GPU worker in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kushpatel2601/HeritageLens/blob/main/notebooks/heritage_gpu_worker.ipynb)
 
 Built for **HackCult ’26, IIT Gandhinagar**, Track 2, **HC26-CULT01**: *Digital Revitalisation of Unstructured
 Cultural & Architectural Heritage Archives*.

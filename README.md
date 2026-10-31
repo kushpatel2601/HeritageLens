@@ -47,7 +47,7 @@ It covers all three pathways from the problem statement in one system.
 
 | Criterion | Where to look |
 |---|---|
-| **Technical Execution & Code Quality (40%)** | Typed end to end: Pydantic schemas → OpenAPI → generated TypeScript client, so a backend change that breaks the UI fails `tsc`. **315 automated tests** (backend 143 at 85% line coverage, GPU worker 119, frontend 53); ruff, mypy, ESLint and `tsc` are clean; CI runs all of it plus OpenAPI/client drift checks. Uploads are checked by magic bytes, size and page limits, and de-duplicated by hash. |
+| **Technical Execution & Code Quality (40%)** | Typed end to end: Pydantic schemas → OpenAPI → generated TypeScript client, so a backend change that breaks the UI fails `tsc`. **318 automated tests** (backend 143 at 85% line coverage, GPU worker 119, frontend 56); ruff, mypy, ESLint and `tsc` are clean; CI runs all of it plus OpenAPI/client drift checks. Uploads are checked by magic bytes, size and page limits, and de-duplicated by hash. |
 | **System Architecture & Scalability (30%)** | Stateless FastAPI service; a durable job queue with separate **CPU and GPU queues**, leases, heartbeats, retries with backoff and dead-lettering (`SELECT … FOR UPDATE SKIP LOCKED` on PostgreSQL). GPU workers **pull** work over outbound HTTPS, so any number of Colab sessions can join without open ports. SQLite for a laptop, PostgreSQL + pgvector (HNSW) for production; local disk or S3/MinIO for files. The live demo runs the same code on free tiers: the API in 512 MB on Render using an ONNX export of the multilingual embedder (identical vectors, a third of the memory), the web app on Vercel’s CDN. |
 | **UI/UX (20%)** | One coherent parchment-and-ink design system; map-first atlas; side-by-side reader; live pipeline updates over Server-Sent Events; drag-and-drop contribution with per-file progress. Checked at desktop and phone widths (360 px) with no sideways scrolling; keyboard focus, labels and reduced-motion support throughout. |
 | **Innovation & Problem Fit (10%)** | Phonetic cross-script matching for Indic place names, hybrid search fused with Reciprocal Rank Fusion, CLIP text-to-photo search for untagged photographs, a translation memory so nothing is translated twice, and free-GPU 3D reconstruction from photos the archive already holds. |
@@ -220,7 +220,7 @@ needs a GPU or model downloads.
 |---|---|---|
 | Backend | `cd backend && pytest --cov` | 143 tests, 85% coverage; plus `ruff check`, `ruff format --check`, `mypy app` and an OpenAPI drift check |
 | GPU worker | `cd ml && pytest` | 119 tests, including a contract test that drives the real API with the real worker and fake engines; plus ruff and mypy |
-| Frontend | `cd frontend && npm test` | 53 Vitest tests; plus `npm run lint`, `npm run typecheck`, `npm run build` and a generated-client drift check |
+| Frontend | `cd frontend && npm test` | 56 Vitest tests; plus `npm run lint`, `npm run typecheck`, `npm run build` and a generated-client drift check |
 
 ---
 

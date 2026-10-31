@@ -24,6 +24,7 @@ import { AssetGrid } from "@/components/asset-grid";
 import { AtlasMap } from "@/components/map";
 import { TokenField, useIngestToken } from "@/components/token-field";
 import { Badge, EmptyState, StatusPill } from "@/components/ui/primitives";
+import { RelativeTime } from "@/components/ui/relative-time";
 import { api, ApiError, authHeaders, unwrap } from "@/lib/api/client";
 import { assetQuery, chunksQuery, keys } from "@/lib/api/queries";
 import type { AssetDetail, AssetsGeoJSON, Chunk, Entity, Job, PageOut } from "@/lib/api/types";
@@ -33,7 +34,6 @@ import {
   formatDuration,
   formatNumber,
   formatPercent,
-  formatRelative,
   formatYear,
   jobLabel,
   kindLabel,
@@ -678,13 +678,19 @@ function JobRow({ job, runs, onRetry, retrying }: { job: Job; runs: number; onRe
         </span>
       </div>
       <p className="mt-0.5 pl-1 text-xs text-muted">
-        {job.status === "queued"
-          ? `Waiting since ${formatRelative(job.created_at)}`
-          : job.status === "leased"
-            ? `Running on ${job.lease_owner ?? "a worker"}`
-            : [duration && `took ${duration}`, job.finished_at && formatRelative(job.finished_at)]
-                .filter(Boolean)
-                .join(" · ")}
+        {job.status === "queued" ? (
+          <>
+            Waiting since <RelativeTime iso={job.created_at} />
+          </>
+        ) : job.status === "leased" ? (
+          `Running on ${job.lease_owner ?? "a worker"}`
+        ) : (
+          <>
+            {duration && `took ${duration}`}
+            {duration && job.finished_at && " · "}
+            {job.finished_at && <RelativeTime iso={job.finished_at} />}
+          </>
+        )}
         {job.attempts > 1 && ` · attempt ${job.attempts}/${job.max_attempts}`}
         {runs > 1 && ` · ran ${runs} times`}
       </p>

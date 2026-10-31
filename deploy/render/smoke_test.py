@@ -12,6 +12,7 @@ Exits non-zero on the first failed check.
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import sys
 import time
@@ -42,12 +43,20 @@ class Smoke:
     def request(
         self, url: str, *, data: bytes | None = None, headers: dict[str, str] | None = None
     ) -> tuple[int, dict[str, str], bytes]:
-        req = urllib.request.Request(url, data=data, headers={**UA, **(headers or {})})
-        try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as r:
-                return r.status, {k.lower(): v for k, v in r.headers.items()}, r.read()
-        except urllib.error.HTTPError as e:
-            return e.code, {k.lower(): v for k, v in e.headers.items()}, e.read()
+        # GETs retry: free-tier proxies occasionally cut a large body short.
+        for attempt in range(3):
+            req = urllib.request.Request(url, data=data, headers={**UA, **(headers or {})})
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout) as r:
+                    return r.status, {k.lower(): v for k, v in r.headers.items()}, r.read()
+            except urllib.error.HTTPError as e:
+                return e.code, {k.lower(): v for k, v in e.headers.items()}, e.read()
+            except (http.client.IncompleteRead, ConnectionError, TimeoutError, urllib.error.URLError) as e:
+                if attempt == 2 or data is not None:
+                    raise
+                print(f"  ..  retrying {url} after {type(e).__name__}")
+                time.sleep(2)
+        raise AssertionError("unreachable")
 
     def get_json(self, path: str, label: str) -> Any:
         status, _, body = self.request(self.api + path)

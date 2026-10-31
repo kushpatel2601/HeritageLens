@@ -24,6 +24,8 @@ const STATUS_FILTERS: { value: JobStatus | ""; label: string }[] = [
   { value: "succeeded", label: "Done" },
 ];
 const COLAB_URL = process.env.NEXT_PUBLIC_COLAB_URL;
+// Public API address for remote GPU workers when the server is deployed; otherwise the panel explains tunnelling.
+const WORKER_API_URL = process.env.NEXT_PUBLIC_WORKER_API_URL?.replace(/\/+$/, "");
 
 export function PipelineDashboard() {
   const live = useLive();
@@ -402,9 +404,11 @@ function ConnectWorker() {
         needs no open ports, and you can run several at once.
       </p>
       <ol className="list-decimal space-y-2.5 pl-5 text-sm marker:text-muted">
-        <li>
-          Expose this server: <Code>cloudflared tunnel --url http://localhost:8000</Code>
-        </li>
+        {WORKER_API_URL ? null : (
+          <li>
+            Expose this server: <Code>cloudflared tunnel --url http://localhost:8000</Code>
+          </li>
+        )}
         <li>
           Open{" "}
           {COLAB_URL ? (
@@ -417,8 +421,15 @@ function ConnectWorker() {
           on a T4 runtime.
         </li>
         <li>
-          Add Colab secrets <Code>HERITAGE_API_URL</Code> (the tunnel URL) and <Code>HERITAGE_TOKEN</Code> (the
-          server&apos;s <Code>HL_WORKER_TOKEN</Code>).
+          Add Colab secrets <Code>HERITAGE_API_URL</Code>{" "}
+          {WORKER_API_URL ? (
+            <>
+              = <Code>{WORKER_API_URL}</Code>
+            </>
+          ) : (
+            "(the tunnel URL)"
+          )}{" "}
+          and <Code>HERITAGE_TOKEN</Code> (the server&apos;s <Code>HL_WORKER_TOKEN</Code>).
         </li>
         <li>Run all cells. The worker appears below within seconds and the GPU queue starts draining.</li>
       </ol>

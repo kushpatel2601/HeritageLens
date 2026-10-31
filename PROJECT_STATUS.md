@@ -228,16 +228,17 @@ Done:
     Harir, Toorji ka Jhalra and Agrasen ki Baoli. Each site page shows these first, ahead of the procedural demos.
   - These results live in your local database (`backend/var/`, not in git) and in the deployed snapshot. Don't
     re-seed or delete `backend/var/` before the demo; if you do, run the Colab worker again.
+- [x] Demo video recorded (2:59, narrated, captioned): `frontend/public/demo/heritagelens-demo.mp4`, shown on the home
+      page at `/#demo` and linked from the README.
 
 Still to do:
 
 | Task | Time |
 |---|---|
-| Record the demo video (the live site works for this) | 1–2 h |
 | Make the pitch deck (**at most 10 slides**) | ~2 h |
-| Submit on the HackCult portal before **4 Nov 2026, 6:30 PM IST**, with the repository and live demo links | — |
+| Submit on the HackCult portal before **4 Nov 2026, 6:30 PM IST**, with the repository, live demo and demo video links | — |
 
-**Estimated time left:** no build work; about 3–4 h of your own tasks (video, deck, submission).
+**Estimated time left:** no build work; about 2–3 h of your own tasks (deck, submission).
 
 ---
 

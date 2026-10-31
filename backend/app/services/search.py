@@ -40,7 +40,7 @@ from app.schemas.search import (
     SiteHit,
     Snippet,
 )
-from app.services.embeddings import get_image_embedder, get_text_embedder
+from app.services.embeddings import aget_text_embedder, get_image_embedder
 from app.services.text.entities import static_places
 from app.services.text.phonetic import phonetic_key
 from app.services.text.scripts import WORD_RE, detect_language
@@ -262,7 +262,7 @@ class SearchService:
         filters = filters or SearchFilters()
         terms = QueryTerms.parse(q)
         lang, script = detect_language(q)
-        embedder = get_text_embedder(self.settings)
+        embedder = await aget_text_embedder(self.settings)
         qvec = await asyncio.to_thread(embedder.embed_query, q)
         pg = session.bind is not None and session.bind.dialect.name == "postgresql"
 

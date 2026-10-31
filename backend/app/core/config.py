@@ -42,8 +42,14 @@ class Settings(BaseSettings):
     max_pdf_pages: int = 400
 
     # ML / search
-    embedder: Literal["auto", "fastembed", "hashing"] = "auto"
+    # auto = the lean export when present, else fastembed when installed, else the hashing fallback.
+    embedder: Literal["auto", "lean", "fastembed", "hashing"] = "auto"
     text_embed_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    # Output of `app.cli export-lean-model`: the same text model in ~170 MB of RAM instead of ~500 MB.
+    lean_model_dir: Path = BACKEND_DIR / "var" / "models" / "lean-minilm"
+    embed_threads: int = 0  # ONNX Runtime intra-op threads for text embeddings; 0 = one per core
+    # Load the text model in the background at start-up so the first search after a (cold) boot is fast.
+    warm_embedder: bool = False
     image_embed_model: str = "Qdrant/clip-ViT-B-32-vision"
     image_text_embed_model: str = "Qdrant/clip-ViT-B-32-text"
     enable_image_search: bool = True

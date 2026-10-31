@@ -35,11 +35,12 @@ jobs:
           cache: pip
           cache-dependency-path: backend/pyproject.toml
       - name: Install
-        run: python -m pip install -e ".[dev]"
+        # lean + export bring onnxruntime, sentencepiece and onnx, so the lean-embedder graph tests run too.
+        run: python -m pip install -e ".[dev,lean,export]"
       - name: Lint (ruff)
         run: |
-          ruff check app tests
-          ruff format --check app tests
+          ruff check app tests ../deploy
+          ruff format --check app tests ../deploy
       - name: Type-check (mypy)
         run: mypy app
       - name: Test (pytest)

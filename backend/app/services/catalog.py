@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
 from app.db.models import Asset, Journey, JourneyStop, Site, Twin
-from app.services.embeddings import get_text_embedder
+from app.services.embeddings import aget_text_embedder
 from app.services.geo import haversine_km
 from app.services.text.phonetic import phonetic_key
 
@@ -29,7 +29,7 @@ def site_document(site: Site) -> str:
 async def index_site(site: Site, settings: Settings) -> None:
     """(Re)compute the site's phonetic name keys and semantic embedding. Caller commits."""
     site.phonetic = " | ".join(dict.fromkeys(k for k in (phonetic_key(n) for n in site_names(site)) if k))
-    embedder = get_text_embedder(settings)
+    embedder = await aget_text_embedder(settings)
     site.embedding = (await asyncio.to_thread(embedder.embed, [site_document(site)]))[0]
 
 

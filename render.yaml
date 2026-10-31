@@ -1,0 +1,23 @@
+# Render Blueprint: the HeritageLens API on the free plan (no card needed).
+# One click: https://render.com/deploy?repo=https://github.com/kushpatel2601/HeritageLens
+# The web app is deployed separately on Vercel with API_ORIGIN pointing at this service (see README).
+services:
+  - type: web
+    name: heritagelens-hc26
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./deploy/render/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - backend/app/**
+        - backend/pyproject.toml
+        - deploy/render/**
+    envVars:
+      # Bearer token the Colab GPU worker sends; copy it from the service's Environment tab into the notebook.
+      - key: HL_WORKER_TOKEN
+        generateValue: true
+      # Everything else is set in deploy/render/Dockerfile; override here or in the dashboard if needed.

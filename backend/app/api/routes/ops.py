@@ -15,7 +15,7 @@ from app.api.deps import ServicesDep, SessionDep
 from app.db.base import utcnow
 from app.db.models import Asset, Chunk, Entity, Job, JobStatus, Journey, Page, Site, Twin, Worker
 from app.schemas.catalog import Health, Stats
-from app.services.embeddings import get_text_embedder
+from app.services.embeddings import aget_text_embedder
 
 router = APIRouter(tags=["ops"])
 
@@ -61,7 +61,7 @@ async def ready(services: ServicesDep, session: SessionDep) -> JSONResponse:
         status="ok" if healthy else "degraded",
         version=__version__,
         database=services.db.dialect,
-        embedder=get_text_embedder(services.settings).name,
+        embedder=(await aget_text_embedder(services.settings)).name,
         workers_online=workers,
         checks=checks,
     )
@@ -102,7 +102,7 @@ async def stats(services: ServicesDep, session: SessionDep) -> Stats:
         jobs_by_status=await group(Job.status),
         queue_depth={q: int(n) for q, n in depth},
         workers_online=sum(online.values()),
-        embedder=get_text_embedder(services.settings).name,
+        embedder=(await aget_text_embedder(services.settings)).name,
         database=services.db.dialect,
     )
 

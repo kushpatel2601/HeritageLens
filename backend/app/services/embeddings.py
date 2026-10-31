@@ -2,6 +2,8 @@
 
 * `FastEmbedTextEmbedder`  - multilingual MiniLM via ONNX Runtime (CPU, no torch); 50+ languages
   including Hindi, Gujarati, Marathi share one vector space with English.
+* `LeanTextEmbedder`       - the same model and vectors in a third of the memory, for 512 MB hosts
+  (see `app.services.lean_embedder`).
 * `HashingEmbedder`        - dependency-free deterministic fallback (char n-grams over phonetic keys),
   so the system degrades gracefully offline and tests stay hermetic.
 * `ClipImageEmbedder`      - CLIP ViT-B/32 image + text towers for "describe the photo" search.
@@ -9,6 +11,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import threading
 import zlib
@@ -21,7 +24,7 @@ from app.core.config import BACKEND_DIR, Settings, get_settings
 from app.services.text.phonetic import phonetic_key
 
 log = logging.getLogger(__name__)
-_MODEL_DIR = BACKEND_DIR / "var" / "models"
+MODEL_CACHE_DIR = BACKEND_DIR / "var" / "models"
 
 
 def _normalise(mat: np.ndarray) -> np.ndarray:
@@ -65,12 +68,12 @@ class HashingEmbedder:
 
 
 class FastEmbedTextEmbedder:
-    def __init__(self, model: str, dim: int) -> None:
+    def __init__(self, model: str, dim: int, threads: int = 0) -> None:
         from fastembed import TextEmbedding
 
         self.name = model
         self.dim = dim
-        self._model = TextEmbedding(model_name=model, cache_dir=str(_MODEL_DIR))
+        self._model = TextEmbedding(model_name=model, cache_dir=str(MODEL_CACHE_DIR), threads=threads or None)
         self._lock = threading.Lock()
 
     def embed(self, texts: list[str]) -> np.ndarray:
@@ -89,8 +92,8 @@ class ClipImageEmbedder:
         from fastembed import ImageEmbedding, TextEmbedding
 
         self.name = vision_model
-        self._vision = ImageEmbedding(model_name=vision_model, cache_dir=str(_MODEL_DIR))
-        self._text = TextEmbedding(model_name=text_model, cache_dir=str(_MODEL_DIR))
+        self._vision = ImageEmbedding(model_name=vision_model, cache_dir=str(MODEL_CACHE_DIR))
+        self._text = TextEmbedding(model_name=text_model, cache_dir=str(MODEL_CACHE_DIR))
         self._lock = threading.Lock()
 
     def embed_images(self, paths_or_bytes: list[object]) -> np.ndarray:
@@ -124,10 +127,41 @@ def get_text_embedder(settings: Settings | None = None) -> TextEmbedder:
     return _text_embedder
 
 
+async def aget_text_embedder(settings: Settings | None = None) -> TextEmbedder:
+    """`get_text_embedder` for async code: a cold model load (tens of seconds on a 0.1-CPU host) runs in a
+    thread instead of stalling the event loop, health checks included."""
+    if _text_embedder is not None:
+        return _text_embedder
+    return await asyncio.to_thread(get_text_embedder, settings)
+
+
+async def warm_text_embedder(settings: Settings) -> None:
+    """Load the text model and run one query so the first real search does not pay the start-up cost."""
+    try:
+        embedder = await aget_text_embedder(settings)
+        await asyncio.to_thread(embedder.embed_query, "warm-up")
+        log.info("text embedder warmed up: %s", embedder.name)
+    except Exception:
+        log.exception("text embedder warm-up failed; it will load on first use")
+
+
 def _build_text_embedder(settings: Settings) -> TextEmbedder:
+    from app.services.lean_embedder import LeanTextEmbedder, is_lean_model_dir
+
+    if settings.embedder == "lean" or (settings.embedder == "auto" and is_lean_model_dir(settings.lean_model_dir)):
+        try:
+            lean = LeanTextEmbedder(
+                settings.lean_model_dir, expected_model=settings.text_embed_model, threads=settings.embed_threads
+            )
+            log.info("text embedder: %s (lean runtime from %s)", lean.name, settings.lean_model_dir)
+            return lean
+        except Exception as exc:
+            if settings.embedder == "lean":
+                raise
+            log.warning("lean text model unusable (%s); trying fastembed", exc)
     if settings.embedder in ("auto", "fastembed"):
         try:
-            emb = FastEmbedTextEmbedder(settings.text_embed_model, settings.embed_dim)
+            emb = FastEmbedTextEmbedder(settings.text_embed_model, settings.embed_dim, settings.embed_threads)
             log.info("text embedder: %s", emb.name)
             return emb
         except Exception as exc:

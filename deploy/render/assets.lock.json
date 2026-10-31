@@ -1,0 +1,16 @@
+{
+  "assets": {
+    "data": {
+      "url": "https://github.com/kushpatel2601/HeritageLens/releases/download/deploy-assets/heritagelens-data-bc017dabf8c5.tar.gz",
+      "sha256": "bc017dabf8c581438c260facf64107687d0833e9b1f065cfd197af66e44ccfc4",
+      "bytes": 42705631,
+      "dest": "backend/var"
+    },
+    "model": {
+      "url": "https://github.com/kushpatel2601/HeritageLens/releases/download/deploy-assets/lean-minilm-6ed931b8176f.tar.gz",
+      "sha256": "6ed931b8176fee51a32f417aa92fc98671af4bcaeccc066bf5ec09ce7183c6a2",
+      "bytes": 219528065,
+      "dest": "backend/var/models/lean-minilm"
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 import uuid
@@ -21,6 +22,7 @@ from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import configure_logging, request_id_var
 from app.db.session import Database
+from app.services.embeddings import warm_text_embedder
 from app.services.events import EventHub
 from app.services.jobs import JobQueue
 from app.services.search import SearchService
@@ -99,12 +101,19 @@ def create_app(settings: Settings | None = None, *, services: Services | None = 
                 svc.ctx, concurrency=settings.embedded_worker_concurrency, name="embedded cpu worker"
             )
             await svc.worker.start()
+        warm_up = (
+            asyncio.create_task(warm_text_embedder(settings), name="embedder-warm-up")
+            if settings.warm_embedder
+            else None
+        )
         log.info(
             "%s %s ready (db=%s, storage=%s)", settings.app_name, __version__, svc.db.dialect, settings.storage_backend
         )
         try:
             yield
         finally:
+            if warm_up is not None and not warm_up.done():
+                warm_up.cancel()
             if svc.worker is not None:
                 await svc.worker.stop()
             await svc.events.close()

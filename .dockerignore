@@ -1,0 +1,8 @@
+# Docker build context is the repository root (deploy/render/Dockerfile): send only what the image copies.
+*
+!backend/pyproject.toml
+!backend/README.md
+!backend/app/
+!deploy/render/fetch_assets.py
+!deploy/render/assets.lock.json
+**/__pycache__

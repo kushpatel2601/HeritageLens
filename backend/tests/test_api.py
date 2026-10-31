@@ -105,6 +105,20 @@ def test_health_readiness_and_openapi(client: TestClient) -> None:
     assert stats["assets"] == 0 and stats["database"] == "sqlite"
 
 
+def test_embedder_warm_up_runs_in_background(tmp_path: Any) -> None:
+    from app.main import create_app
+    from app.services import embeddings
+    from tests.conftest import make_settings
+
+    assert embeddings._text_embedder is None
+    with TestClient(create_app(make_settings(tmp_path, warm_embedder=True))) as c:
+        assert c.get(f"{API}/health").status_code == 200
+        deadline = time.monotonic() + 10
+        while embeddings._text_embedder is None and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert embeddings._text_embedder is not None and embeddings._text_embedder.name.startswith("hashing")
+
+
 def test_errors_are_problem_json(client: TestClient) -> None:
     body = _problem(client.get(f"{API}/assets/424242"), 404)
     assert body["instance"] == f"{API}/assets/424242" and body["request_id"]

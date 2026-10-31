@@ -15,7 +15,7 @@ from sqlalchemy import select
 
 from app.core.config import BACKEND_DIR, Settings, get_settings
 from app.core.logging import configure_logging
-from app.db.models import Asset, Site
+from app.db.models import Asset, Chunk, Site
 from app.db.session import Database
 from app.services.catalog import index_site
 from app.services.jobs import JobQueue
@@ -127,6 +127,33 @@ def cmd_serve(settings: Settings, args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_export_lean_model(settings: Settings, args: argparse.Namespace) -> int:
+    from app.services.embeddings import MODEL_CACHE_DIR
+    from app.services.lean_export import export_lean_model
+
+    async def archive_texts() -> list[str]:
+        db = Database(settings)
+        try:
+            async with db.sessionmaker() as s:
+                rows = (await s.execute(select(Chunk.text, Chunk.translation).limit(args.archive_texts))).all()
+        finally:
+            await db.dispose()
+        return [t for row in rows for t in row if t]
+
+    extra = asyncio.run(archive_texts()) if args.archive_texts else []
+    out = Path(args.out) if args.out else settings.lean_model_dir
+    report = export_lean_model(settings.text_embed_model, out, cache_dir=MODEL_CACHE_DIR, extra_texts=extra)
+    summary = {
+        "out_dir": str(report.out_dir),
+        "model": report.manifest.model,
+        "files_mb": report.files_mb,
+        "texts_checked": report.texts_checked,
+        "min_cosine_vs_fastembed": report.min_cosine,
+    }
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    return 0
+
+
 # ---------------------------------------------------------------- parser
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="heritagelens", description=__doc__)
@@ -160,6 +187,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--port", type=int, default=8000)
     p.add_argument("--reload", action="store_true")
     p.set_defaults(func=cmd_serve)
+
+    p = sub.add_parser(
+        "export-lean-model",
+        help="rewrite the text model for 512 MB hosts (same vectors, ~1/3 of the RAM); needs the ml+export extras",
+    )
+    p.add_argument("--out", default=None, help="target directory (default: HL_LEAN_MODEL_DIR)")
+    p.add_argument(
+        "--archive-texts", type=int, default=0, metavar="N", help="also verify parity on N chunks from the database"
+    )
+    p.set_defaults(func=cmd_export_lean_model)
     return parser
 
 

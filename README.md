@@ -8,6 +8,9 @@
 Built for **HackCult ’26, IIT Gandhinagar**, Track 2, **HC26-CULT01**: *Digital Revitalisation of Unstructured
 Cultural & Architectural Heritage Archives*.
 
+**Live demo:** <https://heritagelens-hc26.vercel.app> · API and docs: <https://heritagelens-hc26.onrender.com/docs>
+(free tiers; if the API has been idle, the first request can take about a minute while it wakes).
+
 ![Atlas home: heritage sites, expedition routes and geotagged photographs on one map](docs/screenshots/atlas.png)
 
 ---
@@ -44,8 +47,8 @@ It covers all three pathways from the problem statement in one system.
 
 | Criterion | Where to look |
 |---|---|
-| **Technical Execution & Code Quality (40%)** | Typed end to end: Pydantic schemas → OpenAPI → generated TypeScript client, so a backend change that breaks the UI fails `tsc`. **296 automated tests** (backend 127 at 86% line coverage, GPU worker 119, frontend 50); ruff, mypy, ESLint and `tsc` are clean; CI runs all of it plus OpenAPI/client drift checks. Uploads are checked by magic bytes, size and page limits, and de-duplicated by hash. |
-| **System Architecture & Scalability (30%)** | Stateless FastAPI service; a durable job queue with separate **CPU and GPU queues**, leases, heartbeats, retries with backoff and dead-lettering (`SELECT … FOR UPDATE SKIP LOCKED` on PostgreSQL). GPU workers **pull** work over outbound HTTPS, so any number of Colab sessions can join without open ports. SQLite for a laptop, PostgreSQL + pgvector (HNSW) for production; local disk or S3/MinIO for files. |
+| **Technical Execution & Code Quality (40%)** | Typed end to end: Pydantic schemas → OpenAPI → generated TypeScript client, so a backend change that breaks the UI fails `tsc`. **312 automated tests** (backend 143 at 85% line coverage, GPU worker 119, frontend 50); ruff, mypy, ESLint and `tsc` are clean; CI runs all of it plus OpenAPI/client drift checks. Uploads are checked by magic bytes, size and page limits, and de-duplicated by hash. |
+| **System Architecture & Scalability (30%)** | Stateless FastAPI service; a durable job queue with separate **CPU and GPU queues**, leases, heartbeats, retries with backoff and dead-lettering (`SELECT … FOR UPDATE SKIP LOCKED` on PostgreSQL). GPU workers **pull** work over outbound HTTPS, so any number of Colab sessions can join without open ports. SQLite for a laptop, PostgreSQL + pgvector (HNSW) for production; local disk or S3/MinIO for files. The live demo runs the same code on free tiers: the API in 512 MB on Render using an ONNX export of the multilingual embedder (identical vectors, a third of the memory), the web app on Vercel’s CDN. |
 | **UI/UX (20%)** | One coherent parchment-and-ink design system; map-first atlas; side-by-side reader; live pipeline updates over Server-Sent Events; drag-and-drop contribution with per-file progress. Checked at desktop and phone widths (360 px) with no sideways scrolling; keyboard focus, labels and reduced-motion support throughout. |
 | **Innovation & Problem Fit (10%)** | Phonetic cross-script matching for Indic place names, hybrid search fused with Reciprocal Rank Fusion, CLIP text-to-photo search for untagged photographs, a translation memory so nothing is translated twice, and free-GPU 3D reconstruction from photos the archive already holds. |
 
@@ -156,13 +159,55 @@ Try searching for `વાવ`, `बावड़ी`, `vav` or `stepwell`, open a
 
 GPU jobs (OCR, translation, captions, 3D twins) wait in the queue until a GPU worker connects.
 
-1. Expose your local API with a tunnel, for example `cloudflared tunnel --url http://localhost:8000`.
+1. Point the worker at an API it can reach: the live demo
+   (`https://heritagelens-hc26.onrender.com`, token from the Render service’s **Environment** tab), or your local
+   API through a tunnel, for example `cloudflared tunnel --url http://localhost:8000`.
 2. Open [`notebooks/heritage_gpu_worker.ipynb`](notebooks/heritage_gpu_worker.ipynb) in Colab (badge above),
-   choose a GPU runtime, paste the tunnel URL and your `HL_WORKER_TOKEN`, and run all cells.
+   choose a GPU runtime, set `HERITAGE_API_URL` and `HERITAGE_TOKEN` (the server’s `HL_WORKER_TOKEN`), and run
+   all cells.
 3. Watch the jobs complete live on **Archive → Pipeline**.
 
 The worker can also run on any machine with `pip install "./ml[models]"` and `python -m heritage_gpu run`. Engines,
 flags and the lease protocol are documented in [`ml/README.md`](ml/README.md).
+
+---
+
+## Deploy it free (Render + Vercel)
+
+The live demo costs nothing and needs no card. Render redeploys the API on every push to `main` that touches it; the
+web app is deployed from the CLI (or connect the repository in Vercel with Root Directory `frontend`).
+
+**API on Render** (free web service: 512 MB RAM, sleeps after 15 idle minutes, ephemeral disk)
+
+1. Click **New → Blueprint** in Render and pick this repository, or open
+   `https://render.com/deploy?repo=https://github.com/kushpatel2601/HeritageLens`. [`render.yaml`](render.yaml)
+   builds [`deploy/render/Dockerfile`](deploy/render/Dockerfile) and generates `HL_WORKER_TOKEN`.
+2. The image downloads the archive snapshot and the lean ONNX embedder from the `deploy-assets` release, checked
+   against the SHA-256 hashes in [`assets.lock.json`](deploy/render/assets.lock.json). To publish a new snapshot,
+   run [`build_assets.py`](deploy/render/build_assets.py).
+3. Set the repository variable `API_URL` to the service URL. The [keep-alive workflow](.github/workflows/keepalive.yml)
+   then pings `/api/v1/health` every 5 minutes so the demo stays awake.
+
+**Web app on Vercel** (Hobby plan)
+
+```bash
+cd frontend
+npx vercel link
+npx vercel env add API_ORIGIN production                  # https://<your-service>.onrender.com
+npx vercel env add NEXT_PUBLIC_WORKER_API_URL production  # same URL, shown in the pipeline's "Add GPU capacity" panel
+npx vercel deploy --prod
+```
+
+[`vercel.json`](frontend/vercel.json) selects the Next.js preset and the Singapore region, next to the API. The
+browser only talks to Vercel; `/api/*` is rewritten to Render, and immutable files (originals, 3D twins) are cached
+at Vercel’s edge.
+
+**Check a deployment:** `python deploy/render/smoke_test.py --api https://<api> --web https://<web>` runs 31
+read-only checks (health, catalogue, cross-script search, SSE, worker auth, every page and the proxy).
+
+**Free-tier trade-offs:** CLIP photo search is off (it alone needs about 350 MB). Uploads work but disappear when
+the service restarts or redeploys. Without a GPU worker, OCR falls back to Tesseract on a shared CPU, which is slow
+and weaker on handwriting; connect the Colab worker for the real models.
 
 ---
 
@@ -173,7 +218,7 @@ needs a GPU or model downloads.
 
 | Part | Command | Checks |
 |---|---|---|
-| Backend | `cd backend && pytest --cov` | 127 tests, 86% coverage; plus `ruff check`, `ruff format --check`, `mypy app` and an OpenAPI drift check |
+| Backend | `cd backend && pytest --cov` | 143 tests, 85% coverage; plus `ruff check`, `ruff format --check`, `mypy app` and an OpenAPI drift check |
 | GPU worker | `cd ml && pytest` | 119 tests, including a contract test that drives the real API with the real worker and fake engines; plus ruff and mypy |
 | Frontend | `cd frontend && npm test` | 50 Vitest tests; plus `npm run lint`, `npm run typecheck`, `npm run build` and a generated-client drift check |
 
@@ -196,6 +241,7 @@ frontend/              Next.js 16 app (App Router, Tailwind CSS v4, TanStack Que
   src/app/             pages: atlas, sites, journeys, search, assets, contribute, archive, pipeline
   src/components/      UI by feature (atlas, search, asset reader, viewer, contribute, archive, ...)
   src/lib/api/         OpenAPI document, generated types and typed client
+deploy/render/         free Render deployment: Dockerfile, pinned asset snapshot, live smoke test
 docs/screenshots/      images used in this README
 ```
 

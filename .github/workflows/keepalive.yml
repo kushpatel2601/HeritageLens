@@ -1,11 +1,12 @@
 # Render's free plan sleeps after 15 minutes without traffic (about a minute to wake) and restarts from
 # the baked snapshot. Pinging the health check keeps the demo warm; one always-on free service fits
 # inside Render's 750 free instance hours a month. Set the API_URL repository variable to enable it.
+# GitHub delays scheduled runs under load, so ping at the 5-minute minimum to stay well inside 15 minutes.
 name: keep-alive
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions: {}

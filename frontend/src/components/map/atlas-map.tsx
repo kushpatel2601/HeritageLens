@@ -197,9 +197,14 @@ export default function AtlasMap({
     const markers = stops.map((stop) => {
       const el = document.createElement("button");
       el.type = "button";
-      el.className =
-        "flex size-8 items-center justify-center rounded-full border-2 border-white bg-indigo-ink text-sm font-bold text-white shadow-lg transition-transform data-[active=true]:scale-125 data-[active=true]:bg-terracotta";
-      el.textContent = String(stop.seq);
+      el.className = "group rounded-full";
+      // Scale an inner dot, never the marker itself: Tailwind's `scale-*` sets the CSS `scale` property, which
+      // composes outside MapLibre's positioning transform and would push the active stop away from its point.
+      const dot = document.createElement("span");
+      dot.className =
+        "flex size-8 items-center justify-center rounded-full border-2 border-white bg-indigo-ink text-sm font-bold text-white shadow-lg transition-transform group-data-[active=true]:scale-125 group-data-[active=true]:bg-terracotta";
+      dot.textContent = String(stop.seq);
+      el.append(dot);
       el.setAttribute("aria-label", `Stop ${stop.seq}: ${stop.title}`);
       el.dataset.seq = String(stop.seq);
       el.addEventListener("click", () => selectStop(stop.seq));

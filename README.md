@@ -9,6 +9,8 @@ Built for **HackCult ’26, IIT Gandhinagar**, Track 2, **HC26-CULT01**: *Digita
 Cultural & Architectural Heritage Archives*.
 
 **Live demo:** <https://heritagelens-hc26.vercel.app> · API and docs: <https://heritagelens-hc26.onrender.com/docs>
+
+**Demo video (3 min):** <https://heritagelens-hc26.vercel.app/demo/heritagelens-demo.mp4> ([watch on the site](https://heritagelens-hc26.vercel.app/#demo), [subtitles](demo/heritagelens-demo.srt); file in the repo: [frontend/public/demo/heritagelens-demo.mp4](frontend/public/demo/heritagelens-demo.mp4))
 (free tiers; if the API has been idle, the first request can take about a minute while it wakes).
 
 ![Atlas home: heritage sites, expedition routes and geotagged photographs on one map](docs/screenshots/atlas.png)

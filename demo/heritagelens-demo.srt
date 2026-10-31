@@ -1,0 +1,79 @@
+1
+00:00:00,255 --> 00:00:06,640
+Kem cho, everyone! This is HeritageLens, our project for HackCult '26, Track 2.
+
+2
+00:00:06,655 --> 00:00:15,378
+India's heritage lives in Gujarati and Hindi field journals, scanned PDFs and untagged photos, and almost none of it is searchable.
+
+3
+00:00:16,351 --> 00:00:26,377
+HeritageLens turns that archive into one living atlas, covering all three pathways: regional text archives, an interactive map and 3D digital twins.
+
+4
+00:00:27,435 --> 00:00:30,441
+Let's search for 'vav', Gujarati for stepwell.
+
+5
+00:00:30,447 --> 00:00:36,718
+Results come from Gujarati, Hindi and English documents together, with the matching passages highlighted.
+
+6
+00:00:36,722 --> 00:00:44,282
+Keyword, embedding and phonetic search are fused with Reciprocal Rank Fusion, so a place name matches in any script.
+
+7
+00:00:45,162 --> 00:00:54,109
+Each document opens in a side-by-side reader: the original next to its English translation, with places and dates pulled out.
+
+8
+00:00:56,651 --> 00:01:06,410
+OCR, IndicTrans2 translation and photo captions run on a free Colab GPU, and every translation is labelled with where it came from.
+
+9
+00:01:07,871 --> 00:01:14,655
+The atlas puts heritage sites, Explorer Fellowship routes and geotagged photos on one interactive map.
+
+10
+00:01:17,887 --> 00:01:24,612
+Journeys open in story mode, walking through an expedition stop by stop, with the notes collected on the way.
+
+11
+00:01:26,460 --> 00:01:36,636
+Now my favourite part: 3D twins. This is Rani ki Vav in Patan, rebuilt from a photo as a point cloud of over 1.6 lakh points.
+
+12
+00:01:36,640 --> 00:01:44,197
+One photo gives a Depth Anything relief; eight or more overlapping photos give a COLMAP and Gaussian-splat model.
+
+13
+00:01:45,352 --> 00:01:56,378
+Anyone can contribute scans, PDFs, slides or photos. Each upload becomes small jobs: extract, OCR, translate, caption and index.
+
+14
+00:01:57,642 --> 00:02:07,757
+The pipeline dashboard streams every job live. The server runs CPU jobs, and Colab GPUs pull GPU jobs over plain HTTPS.
+
+15
+00:02:07,772 --> 00:02:11,307
+All 300 jobs in this archive have succeeded.
+
+16
+00:02:12,577 --> 00:02:24,287
+The architecture: Next.js on Vercel, a stateless FastAPI service, and a durable job queue with CPU and GPU lanes, leases, retries and dead letters.
+
+17
+00:02:24,294 --> 00:02:34,706
+To scale, just open more GPU notebooks; no open ports needed. Data lives in PostgreSQL with pgvector, or SQLite on a laptop.
+
+18
+00:02:35,010 --> 00:02:43,940
+Quality matters: 318 automated tests, types shared from the API to the UI, and CI on every push.
+
+19
+00:02:44,246 --> 00:02:50,669
+HeritageLens helps researchers, archivists and heritage tourism explore India's past, in any language.
+
+20
+00:02:50,872 --> 00:02:57,009
+It's live at heritagelens-hc26.vercel.app. Thank you!

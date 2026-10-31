@@ -45,3 +45,6 @@ Thumbs.db
 .playwright-mcp/
 test-results/
 playwright-report/
+
+# Local copy of the demo video (committed under frontend/public/demo)
+demo/*.mp4

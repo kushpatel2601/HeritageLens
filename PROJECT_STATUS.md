@@ -148,14 +148,14 @@ Listed in priority order, with estimates.
 ### B. Frontend unit tests ✅ done
 
 - [x] `vitest.config.mts`: jsdom environment, the `@/` path alias and `@vitejs/plugin-react`.
-- [x] **50 tests passing** in `src/test/`:
+- [x] **53 tests passing** in `src/test/`:
 
   | File | Covers |
   |---|---|
   | `format.test.ts` | highlights, eras, dates, durations, scripts, languages, byte sizes |
   | `passages.test.ts` | stripping overlap between chunks, entity offsets, splitting text into entity pieces |
   | `upload.test.ts` | file types, batching, form building, XHR upload (progress, errors, cancel) |
-  | `live.test.ts` | which caches each event refreshes, batching of event bursts, feed cap, connection sharing |
+  | `live.test.ts` | which caches each event refreshes, batching of event bursts, feed cap, connection sharing, reconnect with backoff |
   | `highlighted.test.tsx` | `<mark>` rendering and ellipses in search snippets |
 
 ### C. CI and documentation ✅ done
@@ -175,7 +175,7 @@ Listed in priority order, with estimates.
   - The problem, the three pathways, and a table mapping the project to the judging criteria.
   - Two **Mermaid diagrams** (architecture and pipeline), both checked to render.
   - Six screenshots in `docs/screenshots/`.
-  - Local setup without Docker, Colab worker steps, the test table (312 tests), project layout, the live links and
+  - Local setup without Docker, Colab worker steps, the test table (315 tests), project layout, the live links and
     a "Deploy it free" section.
   - Credits and licences for models and data, with commercial-use alternatives.
 - [x] `backend/README.md` and a new `frontend/README.md`, replacing the create-next-app default.

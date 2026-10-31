@@ -135,4 +135,95 @@ describe("LiveStore", () => {
     expect(store.getSnapshot().status).toBe("idle");
     vi.unstubAllGlobals();
   });
+
+  describe("when the stream drops", () => {
+    class FakeEventSource {
+      static readonly CONNECTING = 0;
+      static readonly OPEN = 1;
+      static readonly CLOSED = 2;
+      static instances: FakeEventSource[] = [];
+      readyState = FakeEventSource.CONNECTING;
+      closed = false;
+      onopen: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      constructor(readonly url: string) {
+        FakeEventSource.instances.push(this);
+      }
+      addEventListener() {}
+      close() {
+        this.closed = true;
+        this.readyState = FakeEventSource.CLOSED;
+      }
+      open() {
+        this.readyState = FakeEventSource.OPEN;
+        this.onopen?.();
+      }
+      fail(givenUp: boolean) {
+        this.readyState = givenUp ? FakeEventSource.CLOSED : FakeEventSource.CONNECTING;
+        this.onerror?.();
+      }
+    }
+    const latest = () => FakeEventSource.instances.at(-1)!;
+
+    beforeEach(() => {
+      FakeEventSource.instances = [];
+      vi.stubGlobal("EventSource", FakeEventSource);
+    });
+
+    afterEach(() => vi.unstubAllGlobals());
+
+    it("refetches what is on screen after the browser reconnects by itself", () => {
+      store.connect();
+      latest().open();
+      latest().fail(false);
+      expect(store.getSnapshot().status).toBe("reconnecting");
+      expect(FakeEventSource.instances).toHaveLength(1);
+
+      latest().open();
+      expect(store.getSnapshot().status).toBe("open");
+      expect(invalidateQueries).toHaveBeenCalledExactlyOnceWith();
+    });
+
+    it("reopens with backoff after the browser gives up, then catches up", () => {
+      store.connect();
+      latest().open();
+      latest().fail(true);
+      expect(latest().closed).toBe(true);
+      expect(store.getSnapshot().status).toBe("reconnecting");
+
+      vi.advanceTimersByTime(1_999);
+      expect(FakeEventSource.instances).toHaveLength(1);
+      vi.advanceTimersByTime(1);
+      expect(FakeEventSource.instances).toHaveLength(2);
+      expect(store.getSnapshot().status).toBe("reconnecting");
+
+      latest().fail(true);
+      vi.advanceTimersByTime(2_000);
+      expect(FakeEventSource.instances).toHaveLength(2);
+      vi.advanceTimersByTime(2_000);
+      expect(FakeEventSource.instances).toHaveLength(3);
+      expect(invalidateQueries).not.toHaveBeenCalled();
+
+      latest().open();
+      expect(store.getSnapshot().status).toBe("open");
+      expect(invalidateQueries).toHaveBeenCalledExactlyOnceWith();
+
+      latest().fail(true);
+      vi.advanceTimersByTime(2_000);
+      expect(FakeEventSource.instances).toHaveLength(4);
+    });
+
+    it("stops retrying once nothing is listening", () => {
+      const release = store.connect();
+      latest().fail(true);
+      release();
+      expect(store.getSnapshot().status).toBe("idle");
+      vi.advanceTimersByTime(60_000);
+      expect(FakeEventSource.instances).toHaveLength(1);
+
+      store.connect();
+      expect(FakeEventSource.instances).toHaveLength(2);
+      expect(store.getSnapshot().status).toBe("connecting");
+    });
+  });
 });

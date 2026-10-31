@@ -1,7 +1,8 @@
 /**
  * One EventSource per tab, fanned out to the UI. Pipeline events are coalesced into query-cache
  * invalidations (at most one refetch per key per flush window) so a GPU worker finishing hundreds
- * of jobs a minute cannot trigger a refetch storm.
+ * of jobs a minute cannot trigger a refetch storm. A dropped stream is reopened with backoff, and
+ * whatever is on screen is refetched once it is back.
  */
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
@@ -16,6 +17,8 @@ export interface LiveSnapshot {
 }
 
 const FEED_SIZE = 60;
+const RETRY_MIN_MS = 2_000;
+const RETRY_MAX_MS = 30_000;
 
 /** Query keys that become stale when an event arrives. Exported for unit tests. */
 export function keysToInvalidate(event: LiveEvent): QueryKey[] {
@@ -45,6 +48,9 @@ export class LiveStore {
   private readonly pending = new Map<string, QueryKey>();
   private source: EventSource | null = null;
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
+  private retryTimer: ReturnType<typeof setTimeout> | null = null;
+  private retryMs = RETRY_MIN_MS;
+  private dropped = false;
   private refs = 0;
 
   constructor(
@@ -70,7 +76,7 @@ export class LiveStore {
   /** Reference-counted so React StrictMode's double effects never open two connections. */
   connect(): () => void {
     this.refs += 1;
-    if (!this.source) this.open();
+    if (!this.source && !this.retryTimer) this.open();
     return () => {
       this.refs -= 1;
       if (this.refs === 0) this.close();
@@ -82,10 +88,30 @@ export class LiveStore {
       this.setStatus("unsupported");
       return;
     }
-    this.setStatus("connecting");
+    this.setStatus(this.dropped ? "reconnecting" : "connecting");
     const source = new EventSource(this.url);
-    source.onopen = () => this.setStatus("open");
-    source.onerror = () => this.setStatus(source.readyState === EventSource.CLOSED ? "idle" : "reconnecting");
+    source.onopen = () => {
+      this.retryMs = RETRY_MIN_MS;
+      if (this.dropped) {
+        // Anything that happened while disconnected was never streamed, so refetch what is on screen.
+        this.dropped = false;
+        void this.queryClient.invalidateQueries();
+      }
+      this.setStatus("open");
+    };
+    source.onerror = () => {
+      this.dropped = true;
+      this.setStatus("reconnecting");
+      if (source.readyState !== EventSource.CLOSED) return;
+      // The browser stops retrying after a non-2xx reply, e.g. while the API redeploys or wakes up.
+      source.close();
+      this.source = null;
+      this.retryTimer = setTimeout(() => {
+        this.retryTimer = null;
+        if (this.refs > 0) this.open();
+      }, this.retryMs);
+      this.retryMs = Math.min(this.retryMs * 2, RETRY_MAX_MS);
+    };
     source.addEventListener("job", (e) => this.receive("job", e));
     source.addEventListener("asset", (e) => this.receive("asset", e));
     this.source = source;
@@ -96,6 +122,10 @@ export class LiveStore {
     this.source = null;
     if (this.flushTimer) clearTimeout(this.flushTimer);
     this.flushTimer = null;
+    if (this.retryTimer) clearTimeout(this.retryTimer);
+    this.retryTimer = null;
+    this.retryMs = RETRY_MIN_MS;
+    this.dropped = false;
     this.setStatus("idle");
   }
 

@@ -136,7 +136,7 @@ python -m venv .venv
 # Windows: .venv\Scripts\activate    macOS/Linux: source .venv/bin/activate
 pip install -e ".[ml,dev]"          # `ml` adds real multilingual embeddings and CLIP photo search
 python -m app.cli migrate           # create the SQLite database in backend/var/
-python -m app.cli seed              # load the sample archive (17 sites, 3 journeys, 57 assets)
+python -m app.cli seed              # load the sample archive (17 sites, 3 journeys, 59 assets)
 python -m app.cli serve             # http://127.0.0.1:8000 · API docs at /docs
 ```
 

@@ -46,7 +46,7 @@ app/schemas/         Pydantic request and response models
 app/services/        ingest, extractors (PDF, PPTX, DOCX, text, images), pipeline handlers, job queue,
                      hybrid search, text processing (scripts, phonetic keys, entities), storage, geo, twins
 app/workers/         in-process and standalone CPU workers
-app/seed/            sample archive: 17 sites, 3 journeys, 57 assets
+app/seed/            sample archive: 17 sites, 3 journeys, 59 assets
 migrations/          Alembic migrations
 tests/               pytest suite (hermetic: hashing embedder, no network)
 ```

@@ -69,7 +69,7 @@ Browser (Next.js 16) ──▶ FastAPI backend ──▶ SQLite or PostgreSQL + 
 - [x] Sites, journeys and routes; GeoJSON layers; 3D twin requests and twin records.
 - [x] Server-Sent Events stream for live pipeline updates. Job events and the `/jobs` endpoints name what each job
       works on (`asset_title`, `site_name`, `site_slug`), so the dashboard shows titles instead of ids.
-- [x] Seed data: 17 sites, 3 journeys and 57 assets (43 photos, 7 journals, 4 scans, 2 stories, 1 deck), in English,
+- [x] Seed data: 17 sites, 3 journeys and 59 assets (45 photos, 7 journals, 4 scans, 2 stories, 1 deck), in English,
       Gujarati and Hindi.
 - [x] CLI: `migrate`, `seed`, `worker`, `reindex`, `openapi`, `serve`.
 - [x] Quality gate: **143 tests passing** (85% coverage); ruff, ruff format and mypy are clean.

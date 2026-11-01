@@ -1,8 +1,10 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useEffectEvent,
@@ -23,9 +25,16 @@ function makeQueryClient(): QueryClient {
       queries: {
         staleTime: 15_000,
         refetchOnWindowFocus: false,
-        // 4xx responses are answers, not outages: never retry them.
-        retry: (failures, error) =>
-          !(error instanceof ApiError && error.status >= 400 && error.status < 500) && failures < 2,
+        retry: (failures, error) => {
+          if (error instanceof ApiError) {
+            // The free API host sleeps when idle and takes up to a minute to wake: keep trying (~80 s).
+            if (error.isUnavailable) return failures < 12;
+            // 4xx responses are answers, not outages: never retry them.
+            if (error.status >= 400 && error.status < 500) return false;
+          }
+          return failures < 2;
+        },
+        retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8_000),
       },
     },
   });
@@ -47,8 +56,42 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LiveContext.Provider value={live}>{children}</LiveContext.Provider>
+      <LiveContext.Provider value={live}>
+        {children}
+        <WakingNotice client={queryClient} />
+      </LiveContext.Provider>
     </QueryClientProvider>
+  );
+}
+
+/** True while any query is retrying because the API host is asleep or restarting. */
+function isWaking(client: QueryClient): boolean {
+  return client
+    .getQueryCache()
+    .getAll()
+    .some(
+      ({ state }) =>
+        state.fetchStatus === "fetching" &&
+        state.fetchFailureReason instanceof ApiError &&
+        state.fetchFailureReason.isUnavailable,
+    );
+}
+
+function WakingNotice({ client }: { client: QueryClient }) {
+  const subscribe = useCallback((onChange: () => void) => client.getQueryCache().subscribe(onChange), [client]);
+  const waking = useSyncExternalStore(subscribe, () => isWaking(client), () => false);
+  if (!waking) return null;
+  return (
+    <div
+      role="status"
+      className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md items-center gap-3 rounded-[var(--radius-card)] border border-sandstone bg-white p-4 text-sm text-ink-soft shadow-[var(--shadow-card)]"
+    >
+      <LoaderCircle aria-hidden className="size-5 shrink-0 animate-spin text-terracotta motion-reduce:animate-none" />
+      <span>
+        <strong className="block text-ink">Waking the archive server…</strong>
+        The free server sleeps when idle and can take up to a minute to start. This page will load on its own.
+      </span>
+    </div>
   );
 }
 

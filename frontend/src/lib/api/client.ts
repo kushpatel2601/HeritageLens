@@ -10,6 +10,8 @@ export interface Problem {
   request_id?: string;
 }
 
+const GATEWAY_STATUSES = new Set([502, 503, 504]);
+
 export class ApiError extends Error {
   readonly status: number;
   readonly problem: Problem;
@@ -28,6 +30,37 @@ export class ApiError extends Error {
   get isAuth(): boolean {
     return this.status === 401 || this.status === 403;
   }
+
+  /** The API could not be reached (offline, or the free host is asleep or restarting): worth retrying. */
+  get isUnavailable(): boolean {
+    return this.status === 0 || GATEWAY_STATUSES.has(this.status);
+  }
+}
+
+/** What a sleeping or restarting host returns instead of an API response (usually an HTML page). */
+export const WAKING_PROBLEM: Problem = {
+  title: "The archive server is waking up",
+  detail:
+    "The free server sleeps when nobody has used it for a while and takes up to a minute to start. Please try again in a moment.",
+};
+
+/** A request that never got a response (offline, DNS, or a reply that was not JSON). */
+export const UNREACHABLE_PROBLEM: Problem = {
+  title: "Couldn't reach the archive server",
+  detail: "Check your connection and try again. If the free server was asleep, it may need up to a minute to start.",
+};
+
+/**
+ * Turn an error body into a {@link Problem}. Gateway and hosting error pages (HTML, not RFC 7807 JSON) become
+ * {@link WAKING_PROBLEM} so their markup is never shown to people.
+ */
+export function toProblem(status: number, body: unknown): Problem {
+  if (body && typeof body === "object" && ("title" in body || "detail" in body || !GATEWAY_STATUSES.has(status))) {
+    return body as Problem;
+  }
+  const text = typeof body === "string" ? body.trim() : "";
+  if (GATEWAY_STATUSES.has(status) || text.startsWith("<")) return WAKING_PROBLEM;
+  return text ? { detail: text.length > 300 ? `${text.slice(0, 300)}…` : text } : {};
 }
 
 export function describeProblem(status: number, problem: Problem): string {
@@ -58,13 +91,12 @@ export async function unwrap<T>(promise: Promise<Result<T>>): Promise<T> {
   let result: Result<T>;
   try {
     result = await promise;
-  } catch (cause) {
-    throw new ApiError(0, { title: "The archive service is unreachable", detail: String(cause) });
+  } catch {
+    throw new ApiError(0, UNREACHABLE_PROBLEM);
   }
   const { data, error, response } = result;
   if (error !== undefined || !response.ok) {
-    const problem = (error && typeof error === "object" ? error : { detail: error }) as Problem;
-    throw new ApiError(response.status, problem);
+    throw new ApiError(response.status, toProblem(response.status, error));
   }
   return data as T;
 }
@@ -78,12 +110,22 @@ export async function getJSON<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE}${path}`, init);
-  } catch (cause) {
-    throw new ApiError(0, { title: "The archive service is unreachable", detail: String(cause) });
+  } catch {
+    throw new ApiError(0, UNREACHABLE_PROBLEM);
   }
   if (!response.ok) {
-    const problem = (await response.json().catch(() => ({}))) as Problem;
-    throw new ApiError(response.status, problem);
+    const text = await response.text().catch(() => "");
+    let body: unknown = text;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      // Not JSON: a hosting or gateway error page.
+    }
+    throw new ApiError(response.status, toProblem(response.status, body));
   }
-  return (await response.json()) as T;
+  try {
+    return (await response.json()) as T;
+  } catch {
+    throw new ApiError(0, UNREACHABLE_PROBLEM);
+  }
 }

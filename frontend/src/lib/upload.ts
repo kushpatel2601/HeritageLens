@@ -2,7 +2,7 @@
  * Multipart upload with progress. `fetch` cannot report upload progress, so this uses XHR and
  * maps failures onto the same {@link ApiError} the rest of the client throws.
  */
-import { ApiError, authHeaders, type Problem } from "./api/client";
+import { ApiError, authHeaders, toProblem, UNREACHABLE_PROBLEM } from "./api/client";
 import type { UploadResult } from "./api/types";
 
 export const ACCEPTED_EXTENSIONS = [
@@ -66,9 +66,9 @@ export function uploadForm(
     };
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.response as UploadResult[]);
-      else reject(new ApiError(xhr.status, ((xhr.response as Problem | null) ?? {}) as Problem));
+      else reject(new ApiError(xhr.status, toProblem(xhr.status, xhr.response)));
     };
-    xhr.onerror = () => reject(new ApiError(0, { title: "The archive service is unreachable" }));
+    xhr.onerror = () => reject(new ApiError(0, UNREACHABLE_PROBLEM));
     xhr.onabort = () => reject(new DOMException("Upload cancelled", "AbortError"));
     signal?.addEventListener("abort", () => xhr.abort(), { once: true });
     xhr.send(form);

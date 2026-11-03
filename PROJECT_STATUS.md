@@ -229,8 +229,9 @@ Done:
     Harir, Toorji ka Jhalra and Agrasen ki Baoli. Each site page shows these first, ahead of the procedural demos.
   - These results live in your local database (`backend/var/`, not in git) and in the deployed snapshot. Don't
     re-seed or delete `backend/var/` before the demo; if you do, run the Colab worker again.
-- [x] Demo video recorded (2:59, narrated, captioned): `frontend/public/demo/heritagelens-demo.mp4`, shown on the home
-      page at `/#demo` and linked from the README.
+- [x] Demo video recorded (2:59, narrated, captioned): on YouTube at <https://youtu.be/xtlPzkm7XPE>, and as
+      `frontend/public/demo/heritagelens-demo.mp4`, shown on the home page at `/#demo`. Both are linked from the
+      README and the pitch deck.
 - [x] Pitch deck (10 slides, tagged and bookmarked PDF): `frontend/public/heritagelens-pitch-deck.pdf`, live at
       <https://heritagelens-hc26.vercel.app/heritagelens-pitch-deck.pdf>. It covers the problem, solution,
       pipeline and search, architecture, database schema, tech stack, value, scalability, and limitations with a

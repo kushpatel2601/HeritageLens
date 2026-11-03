@@ -51,6 +51,18 @@ export default function AtlasPage() {
             <source src="/demo/heritagelens-demo.mp4" type="video/mp4" />
             <a href="/demo/heritagelens-demo.mp4">Download the demo video</a>
           </video>
+          <p className="mt-3 text-sm text-ink-soft">
+            Also on{" "}
+            <a
+              href="https://youtu.be/xtlPzkm7XPE"
+              className="text-indigo-ink underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              YouTube<span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            .
+          </p>
         </div>
       </section>
     </>

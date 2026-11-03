@@ -148,7 +148,7 @@ Listed in priority order, with estimates.
 ### B. Frontend unit tests ✅ done
 
 - [x] `vitest.config.mts`: jsdom environment, the `@/` path alias and `@vitejs/plugin-react`.
-- [x] **56 tests passing** in `src/test/`:
+- [x] **64 tests passing** in `src/test/`:
 
   | File | Covers |
   |---|---|
@@ -158,6 +158,7 @@ Listed in priority order, with estimates.
   | `live.test.ts` | which caches each event refreshes, batching of event bursts, feed cap, connection sharing, reconnect with backoff |
   | `highlighted.test.tsx` | `<mark>` rendering and ellipses in search snippets |
   | `relative-time.test.tsx` | relative times hydrate cached HTML without a mismatch, then refresh |
+  | `client.test.ts` | API errors: RFC 7807 problems, hosting HTML error pages hidden behind a friendly "waking up" message, network failures |
 
 ### C. CI and documentation ✅ done
 
@@ -176,7 +177,7 @@ Listed in priority order, with estimates.
   - The problem, the three pathways, and a table mapping the project to the judging criteria.
   - Two **Mermaid diagrams** (architecture and pipeline), both checked to render.
   - Six screenshots in `docs/screenshots/`.
-  - Local setup without Docker, Colab worker steps, the test table (318 tests), project layout, the live links and
+  - Local setup without Docker, Colab worker steps, the test table (326 tests), project layout, the live links and
     a "Deploy it free" section.
   - Credits and licences for models and data, with commercial-use alternatives.
 - [x] `backend/README.md` and a new `frontend/README.md`, replacing the create-next-app default.
@@ -230,15 +231,18 @@ Done:
     re-seed or delete `backend/var/` before the demo; if you do, run the Colab worker again.
 - [x] Demo video recorded (2:59, narrated, captioned): `frontend/public/demo/heritagelens-demo.mp4`, shown on the home
       page at `/#demo` and linked from the README.
+- [x] Pitch deck (10 slides, tagged and bookmarked PDF): `frontend/public/heritagelens-pitch-deck.pdf`, live at
+      <https://heritagelens-hc26.vercel.app/heritagelens-pitch-deck.pdf>. It covers the problem, solution,
+      pipeline and search, architecture, database schema, tech stack, value, scalability, and limitations with a
+      roadmap.
 
 Still to do:
 
 | Task | Time |
 |---|---|
-| Make the pitch deck (**at most 10 slides**) | ~2 h |
-| Submit on the HackCult portal before **4 Nov 2026, 6:30 PM IST**, with the repository, live demo and demo video links | — |
+| Submit on the HackCult portal before **4 Nov 2026, 6:30 PM IST**, with the repository, live demo, demo video and pitch deck links | ~15 min |
 
-**Estimated time left:** no build work; about 2–3 h of your own tasks (deck, submission).
+**Estimated time left:** no build work; only the portal submission.
 
 ---
 

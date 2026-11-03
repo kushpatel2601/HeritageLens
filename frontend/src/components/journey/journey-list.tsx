@@ -21,13 +21,17 @@ export function JourneyList() {
           </li>
         ))}
       {data?.map((j) => (
-        <li key={j.slug} className="flex">
+        <li key={j.slug} data-reveal className="flex">
           <Link
             href={`/journeys/${j.slug}`}
-            className="card group flex w-full flex-col overflow-hidden transition-shadow hover:shadow-[var(--shadow-lift)]"
+            className="card card-lift group flex w-full flex-col overflow-hidden"
           >
-            <div className="relative">
-              <Thumb src={j.cover_url} alt="" className="aspect-[16/10] w-full" />
+            <div className="relative overflow-hidden">
+              <Thumb
+                src={j.cover_url}
+                alt=""
+                className="aspect-[16/10] w-full transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.04]"
+              />
               <span aria-hidden className="absolute inset-x-0 bottom-0 h-1.5" style={{ background: j.color }} />
             </div>
             <div className="flex flex-1 flex-col p-5">

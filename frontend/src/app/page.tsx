@@ -8,7 +8,7 @@ export default function AtlasPage() {
     <>
       <section className="border-b border-sandstone bg-gradient-to-b from-sand to-parchment">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 lg:grid-cols-[1.1fr_1fr] lg:items-end">
-          <div>
+          <div className="rise-in">
             <p className="eyebrow mb-2">Indian Knowledge Systems · Field archive</p>
             <h1 className="text-4xl leading-[1.05] font-semibold text-balance sm:text-5xl">
               Field notes, photographs and journals, <span className="text-terracotta">read, mapped and rebuilt</span>.
@@ -33,15 +33,18 @@ export default function AtlasPage() {
         </div>
       </section>
       <AtlasExplorer />
-      <section id="demo" className="scroll-mt-20 border-t border-sandstone bg-sand/40">
+      <section id="demo" className="border-t border-sandstone bg-sand/40">
         <div className="mx-auto max-w-5xl px-4 py-12">
-          <p className="eyebrow mb-2">Demo · 3 minutes</p>
-          <h2 className="text-3xl font-semibold text-balance">See HeritageLens in action</h2>
-          <p className="mt-2 max-w-2xl text-ink-soft">
-            Multilingual search, the side-by-side reader, the atlas and field journeys, 3D twins, contributions and the
-            live GPU pipeline, narrated end to end.
-          </p>
+          <div data-reveal>
+            <p className="eyebrow mb-2">Demo · 3 minutes</p>
+            <h2 className="text-3xl font-semibold text-balance">See HeritageLens in action</h2>
+            <p className="mt-2 max-w-2xl text-ink-soft">
+              Multilingual search, the side-by-side reader, the atlas and field journeys, 3D twins, contributions and
+              the live GPU pipeline, narrated end to end.
+            </p>
+          </div>
           <video
+            data-reveal
             className="card mt-6 aspect-video w-full overflow-hidden bg-ink p-0"
             controls
             playsInline
@@ -51,7 +54,7 @@ export default function AtlasPage() {
             <source src="/demo/heritagelens-demo.mp4" type="video/mp4" />
             <a href="/demo/heritagelens-demo.mp4">Download the demo video</a>
           </video>
-          <p className="mt-3 text-sm text-ink-soft">
+          <p data-reveal className="mt-3 text-sm text-ink-soft">
             Also on{" "}
             <a
               href="https://youtu.be/xtlPzkm7XPE"

@@ -144,7 +144,7 @@ export function SectionHeading({
   className?: string;
 }) {
   return (
-    <div className={clsx("mb-5 flex flex-wrap items-end justify-between gap-3", className)}>
+    <div data-reveal className={clsx("mb-5 flex flex-wrap items-end justify-between gap-3", className)}>
       <div>
         {eyebrow && <p className="eyebrow mb-1">{eyebrow}</p>}
         <h2 id={id} className="text-3xl font-semibold">

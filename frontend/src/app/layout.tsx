@@ -3,6 +3,9 @@ import { Atkinson_Hyperlegible, Crimson_Pro, Noto_Sans_Devanagari, Noto_Sans_Guj
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { BackToTop } from "@/components/motion/back-to-top";
+import { ScrollProgress } from "@/components/motion/scroll-progress";
+import { ScrollReveal } from "@/components/motion/scroll-reveal";
 import { HeaderSearch, LiveIndicator, NavLinks, NavList } from "@/components/nav";
 import { Providers } from "@/components/providers";
 
@@ -50,6 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${crimson.variable} ${atkinson.variable} ${notoGujarati.variable} ${notoDevanagari.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
@@ -60,7 +64,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <Providers>
-          <header className="jali sticky top-0 z-40 shadow-md">
+          <header className="jali site-header sticky top-0 z-40 shadow-md">
             <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-2.5">
               <Logo />
               <nav aria-label="Primary" className="ml-2 hidden lg:block">
@@ -78,12 +82,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <NavLinks className="w-max" />
               </Suspense>
             </nav>
+            <ScrollProgress />
           </header>
           <main id="main" className="flex flex-1 flex-col">
             {children}
           </main>
           <footer className="border-t border-sandstone bg-sand">
-            <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-muted md:flex-row md:justify-between">
+            {/* Extra room on the bottom (mobile) and right (desktop) keeps the credits clear of the back-to-top button. */}
+            <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 pt-6 pb-28 text-sm text-muted md:flex-row md:justify-between md:pr-20 md:pb-6">
               <p>
                 <span className="font-serif text-base font-semibold text-ink">HeritageLens</span> — built for HackCult
                 ’26 (HC26-CULT01) · Indian Knowledge Systems field archives.
@@ -94,6 +100,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </p>
             </div>
           </footer>
+          <BackToTop />
+          <ScrollReveal />
         </Providers>
       </body>
     </html>

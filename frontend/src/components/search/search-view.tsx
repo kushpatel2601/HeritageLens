@@ -278,7 +278,7 @@ function Results({
             {data.hits.length ? (
               <ol className="space-y-4" start={(page - 1) * PAGE + 1}>
                 {data.hits.map((hit) => (
-                  <li key={hit.chunk_id}>
+                  <li key={hit.chunk_id} data-reveal>
                     <HitCard hit={hit} />
                   </li>
                 ))}

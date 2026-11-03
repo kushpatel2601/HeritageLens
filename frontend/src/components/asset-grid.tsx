@@ -10,13 +10,15 @@ export function AssetTile({ asset, className }: { asset: AssetBrief; className?:
   return (
     <Link
       href={`/assets/${asset.id}`}
-      className={clsx(
-        "card group flex flex-col overflow-hidden transition-shadow hover:shadow-[var(--shadow-lift)]",
-        className,
-      )}
+      className={clsx("card card-lift group flex flex-col overflow-hidden", className)}
     >
-      <div className="relative">
-        <Thumb src={asset.thumb_url} alt="" kind={asset.kind} className="aspect-[4/3] w-full" />
+      <div className="relative overflow-hidden">
+        <Thumb
+          src={asset.thumb_url}
+          alt=""
+          kind={asset.kind}
+          className="aspect-[4/3] w-full transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.04]"
+        />
         {asset.status !== "ready" && <StatusPill status={asset.status} className="absolute top-2 right-2 shadow" />}
       </div>
       <div className="flex flex-1 flex-col gap-1 p-3">
@@ -38,7 +40,7 @@ export function AssetGrid({ assets, className }: { assets: AssetBrief[]; classNa
   return (
     <ul className={clsx("grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4", className)}>
       {assets.map((a) => (
-        <li key={a.id} className="flex">
+        <li key={a.id} data-reveal className="flex">
           <AssetTile asset={a} className="w-full" />
         </li>
       ))}

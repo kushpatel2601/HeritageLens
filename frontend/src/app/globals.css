@@ -57,6 +57,20 @@
   html {
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
+    /* Anchor jumps (#demo, #passage-…) land below the sticky header: two rows on small screens, one on large. */
+    scroll-padding-top: 6.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    html {
+      scroll-padding-top: 4.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
@@ -226,6 +240,67 @@
       radial-gradient(circle at 100% 100%, rgb(255 255 255 / 0.05) 0 22%, transparent 23%);
     background-size: 28px 28px;
   }
+
+  /* Linked cards lift a little and deepen their shadow on hover and keyboard focus. */
+  .card-lift {
+    transition:
+      box-shadow 200ms ease,
+      transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card-lift:hover,
+  .card-lift:focus-visible {
+    box-shadow: var(--shadow-lift);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card-lift:hover,
+    .card-lift:focus-visible {
+      transform: translateY(-3px);
+    }
+
+    /* Hero copy rises in once on load, one block after another. */
+    .rise-in > * {
+      animation: rise-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .rise-in > :nth-child(2) {
+      animation-delay: 80ms;
+    }
+    .rise-in > :nth-child(3) {
+      animation-delay: 160ms;
+    }
+    .rise-in > :nth-child(n + 4) {
+      animation-delay: 240ms;
+    }
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/*
+ * Scroll effects (src/components/motion). Kept outside the cascade layers so they win over Tailwind
+ * utilities such as the header's `shadow-md`.
+ */
+.site-header {
+  transition: box-shadow 250ms ease;
+}
+html[data-scrolled] .site-header {
+  box-shadow: 0 6px 24px rgb(20 17 15 / 0.28);
+}
+
+.scroll-progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  transform: scaleX(var(--progress, 0));
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #f0b45c, var(--color-ochre-soft));
+  pointer-events: none;
 }
 
 /* MapLibre popups in the house style */

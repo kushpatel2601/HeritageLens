@@ -148,7 +148,7 @@ Listed in priority order, with estimates.
 ### B. Frontend unit tests ✅ done
 
 - [x] `vitest.config.mts`: jsdom environment, the `@/` path alias and `@vitejs/plugin-react`.
-- [x] **64 tests passing** in `src/test/`:
+- [x] **77 tests passing** in `src/test/`:
 
   | File | Covers |
   |---|---|
@@ -159,6 +159,7 @@ Listed in priority order, with estimates.
   | `highlighted.test.tsx` | `<mark>` rendering and ellipses in search snippets |
   | `relative-time.test.tsx` | relative times hydrate cached HTML without a mismatch, then refresh |
   | `client.test.ts` | API errors: RFC 7807 problems, hosting HTML error pages hidden behind a friendly "waking up" message, network failures |
+  | `motion.test.tsx` | scroll effects: easing, progress and stagger maths, count-up stats (including reduced motion), reveal-on-scroll leaving on-screen content and server markup alone |
 
 ### C. CI and documentation ✅ done
 
@@ -177,7 +178,7 @@ Listed in priority order, with estimates.
   - The problem, the three pathways, and a table mapping the project to the judging criteria.
   - Two **Mermaid diagrams** (architecture and pipeline), both checked to render.
   - Six screenshots in `docs/screenshots/`.
-  - Local setup without Docker, Colab worker steps, the test table (326 tests), project layout, the live links and
+  - Local setup without Docker, Colab worker steps, the test table (339 tests), project layout, the live links and
     a "Deploy it free" section.
   - Credits and licences for models and data, with commercial-use alternatives.
 - [x] `backend/README.md` and a new `frontend/README.md`, replacing the create-next-app default.

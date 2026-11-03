@@ -45,13 +45,17 @@ export function SiteGrid() {
             </li>
           ))}
         {shown.map((s) => (
-          <li key={s.slug} className="flex">
+          <li key={s.slug} data-reveal className="flex">
             <Link
               href={`/sites/${s.slug}`}
-              className="card group flex w-full flex-col overflow-hidden transition-shadow hover:shadow-[var(--shadow-lift)]"
+              className="card card-lift group flex w-full flex-col overflow-hidden"
             >
-              <div className="relative">
-                <Thumb src={s.cover_url} alt="" className="aspect-[16/10] w-full" />
+              <div className="relative overflow-hidden">
+                <Thumb
+                  src={s.cover_url}
+                  alt=""
+                  className="aspect-[16/10] w-full transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.04]"
+                />
                 <div className="absolute top-2 left-2 flex gap-1.5">
                   {s.unesco && <Badge tone="ochre">UNESCO</Badge>}
                   {s.twin_count > 0 && (
